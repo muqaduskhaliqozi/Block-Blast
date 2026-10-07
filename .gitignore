@@ -1,0 +1,45 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emory[Cc]aptures/
+[Rr]ecordings/
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity VCS (Plastic SCM)
+.plastic/
+
+# Build outputs
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Android signing keys (kabhi upload na karein)
+*.keystore
+*.jks
+
+# OS files
+.DS_Store
+Thumbs.db

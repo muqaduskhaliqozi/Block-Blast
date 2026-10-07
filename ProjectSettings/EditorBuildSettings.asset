@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/SplashScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 63b0eef0c5ab005419aa3125277a64b8
+  - enabled: 1
+    path: Assets/Scenes/BlockBlastGameplay.unity
+    guid: 8e2e70c60ef7eb64889dad88fd940ffb
+  m_configObjects: {}
