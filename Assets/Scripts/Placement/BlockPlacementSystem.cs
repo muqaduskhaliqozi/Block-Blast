@@ -34,6 +34,13 @@ namespace BlockBlast.Placement
             BoardManager board = BoardManager.Instance;
             BlockSlot slot = block.Slot;
 
+            // Remember where the shape lands and the score before, for the "+points" popup
+            Vector3 placedCenter = Vector3.zero;
+            foreach (var offset in block.ShapeData.offsets)
+                placedCenter += board.CellToWorldPosition(origin + offset);
+            placedCenter /= Mathf.Max(1, block.ShapeData.offsets.Count);
+            int scoreBefore = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
+
             // --------------------------------------------------
             // 1. PLACE BLOCK ON BOARD
             // --------------------------------------------------
@@ -119,6 +126,8 @@ namespace BlockBlast.Placement
                     AudioManager.Instance.PlayLineClearSound(totalLines);
                 }
 
+                ShowScorePopup(placedCenter, scoreBefore, true);
+
                 StartCoroutine(
                     board.ClearLinesRoutine(
                         fullRows,
@@ -134,8 +143,17 @@ namespace BlockBlast.Placement
                     ComboManager.Instance.ResetCombo();
                 }
 
+                ShowScorePopup(placedCenter, scoreBefore, false);
+
                 PostPlacementSequence();
             }
+        }
+
+        private void ShowScorePopup(Vector3 worldPos, int scoreBefore, bool big)
+        {
+            if (ScoreManager.Instance == null || BlockBlast.FX.GameFX.Instance == null) return;
+            int gained = ScoreManager.Instance.CurrentScore - scoreBefore;
+            BlockBlast.FX.GameFX.Instance.ShowScorePopup(worldPos, gained, big);
         }
 
         // ======================================================

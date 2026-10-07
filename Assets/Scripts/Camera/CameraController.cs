@@ -23,26 +23,20 @@ namespace BlockBlast.Camera
             cam.orthographic = true;
             cam.backgroundColor = config.backgroundColor;
 
-            // Compute ideal orthographic size based on aspect ratio
-            float targetAspect = 9f / 16f;
-            float currentAspect = (float)Screen.width / Screen.height;
-
-            float baseOrthoSize = 7.5f;
-
-            if (currentAspect < targetAspect)
-            {
-                // Screen is narrower than 9:16 (tall aspect ratios like 19.5:9, 20:9)
-                cam.orthographicSize = baseOrthoSize * (targetAspect / currentAspect);
-            }
-            else
-            {
-                cam.orthographicSize = baseOrthoSize;
-            }
+            // The layout (header + 8x8 board + tray) is designed for a 9.5 x 17.2 world-unit area.
+            // Fit whichever side is the limiting one so nothing is ever cut off.
+            float currentAspect = (float)Screen.width / Mathf.Max(1, Screen.height);
+            cam.orthographicSize = Mathf.Max(designHeight * 0.5f, designWidth / currentAspect * 0.5f);
+            lastScreen = new Vector2Int(Screen.width, Screen.height);
         }
 
-        private void OnRectTransformDimensionsChange()
+        [SerializeField] private float designWidth = 9.5f;
+        [SerializeField] private float designHeight = 17.2f;
+        private Vector2Int lastScreen;
+
+        private void Update()
         {
-            ConfigureCamera();
+            if (Screen.width != lastScreen.x || Screen.height != lastScreen.y) ConfigureCamera();
         }
     }
 }

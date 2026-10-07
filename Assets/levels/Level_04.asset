@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Level_04
   m_EditorClassIdentifier: 
   levelNumber: 4
-  description: Clear 20 line to win!
+  description: Clear 20 lines to win!
   boardWidth: 7
   boardHeight: 7
   targetScore: 15
-  requiredLinesCleared: 15
+  requiredLinesCleared: 20
   maxCellsPerBlock: 4

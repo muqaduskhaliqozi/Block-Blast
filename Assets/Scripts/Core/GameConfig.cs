@@ -38,11 +38,12 @@ namespace BlockBlast.Core
         public Color bgGradientTop = new Color(0.106f, 0.165f, 0.361f, 1.0f);    // #1B2A5C
         public Color bgGradientBottom = new Color(0.055f, 0.078f, 0.200f, 1.0f); // #0E1433
         public Color bgDecoCircleColor = new Color(1.0f, 1.0f, 1.0f, 0.035f);    // Subtle soft circle alpha
-        public Color boardBackgroundColor = new Color(0.09f, 0.11f, 0.22f, 1.0f);
+        public Color boardBackgroundColor = new Color(0.07f, 0.09f, 0.24f, 0.92f);
         public Color emptyCellColor = new Color(0.165f, 0.208f, 0.388f, 1.0f);   // #2A3563
         public Color emptyCellBorderColor = new Color(0.24f, 0.30f, 0.52f, 0.6f);
-        public Color slotPanelColor = new Color(0.12f, 0.14f, 0.26f, 1.0f);
-        public Color shadowColor = new Color(0.0f, 0.0f, 0.0f, 0.35f);
+        public Color slotPanelColor = new Color(0.10f, 0.13f, 0.32f, 0.55f);
+        public bool showSlotPanels = true;
+        public Color shadowColor = new Color(0.0f, 0.0f, 0.05f, 0.45f);
         public Vector3 shadowOffset = new Vector3(0.08f, -0.08f, 0f);
 
         [Header("Preview Highlights")]

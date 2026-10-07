@@ -43,6 +43,8 @@ namespace BlockBlast.Blocks
             }
             slotBackground.sprite = ProceduralSpriteGenerator.GetRoundedSquareSprite(256, 0.12f);
             slotBackground.color = cfg.slotPanelColor;
+            slotBackground.enabled = cfg.showSlotPanels;
+            slotShadow.enabled = cfg.showSlotPanels;
             slotBackground.sortingOrder = -10;
             slotBackground.transform.localScale = new Vector3(slotWidth, slotHeight, 1f);
         }
@@ -59,6 +61,11 @@ namespace BlockBlast.Blocks
                 // Calculate fitted scale so shape never overflows slot padding
                 FittedScale = CalculateFittedScale(block.ShapeData);
                 block.transform.localScale = Vector3.one * FittedScale;
+
+                if (Application.isPlaying)
+                {
+                    block.PlaySpawnPop(FittedScale, 0.05f + SlotIndex * 0.08f);
+                }
             }
         }
 
