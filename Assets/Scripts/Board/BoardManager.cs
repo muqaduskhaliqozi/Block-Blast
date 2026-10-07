@@ -335,13 +335,39 @@ namespace BlockBlast.Board
             {
                 OnLinesCleared?.Invoke(totalLines);
 
-                List<Coroutine> animRoutines = new List<Coroutine>();
-                foreach (BoardCell cell in cellsToClear)
+                // Bright streak over every cleared line
+                var fx = BlockBlast.FX.GameFX.Instance;
+                float step = config.cellSize + config.cellSpacing;
+                if (fx != null)
                 {
-                    animRoutines.Add(StartCoroutine(cell.AnimateClear(config.lineClearDuration)));
+                    foreach (int r in rows)
+                    {
+                        Vector3 a = CellToWorldPosition(new BoardCoordinate(0, r));
+                        Vector3 b = CellToWorldPosition(new BoardCoordinate(width - 1, r));
+                        fx.LineFlash((a + b) * 0.5f, true, width * step);
+                    }
+                    foreach (int c in cols)
+                    {
+                        Vector3 a = CellToWorldPosition(new BoardCoordinate(c, 0));
+                        Vector3 b = CellToWorldPosition(new BoardCoordinate(c, height - 1));
+                        fx.LineFlash((a + b) * 0.5f, false, height * step);
+                    }
+                    if (totalLines >= 2) fx.Shake(0.08f + 0.05f * totalLines, 0.25f + 0.05f * totalLines);
                 }
 
-                yield return new WaitForSeconds(config.lineClearDuration);
+                // Cells pop one after another, rippling out from the middle of the board
+                float centerX = (width - 1) * 0.5f;
+                float centerY = (height - 1) * 0.5f;
+                float maxDelay = 0f;
+                foreach (BoardCell cell in cellsToClear)
+                {
+                    float dist = Mathf.Abs(cell.Coordinate.x - centerX) + Mathf.Abs(cell.Coordinate.y - centerY);
+                    float delay = dist * 0.03f;
+                    maxDelay = Mathf.Max(maxDelay, delay);
+                    StartCoroutine(cell.AnimateClear(config.lineClearDuration, delay));
+                }
+
+                yield return new WaitForSeconds(config.lineClearDuration + maxDelay + 0.02f);
             }
 
             onComplete?.Invoke();

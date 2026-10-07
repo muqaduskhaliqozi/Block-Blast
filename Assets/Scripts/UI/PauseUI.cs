@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using BlockBlast.Core;
 
 namespace BlockBlast.UI
@@ -61,7 +60,6 @@ namespace BlockBlast.UI
 
         private void OnResumeClicked()
         {
-            Debug.Log("[PauseUI] Resume clicked.");
             PlayClick();
 
             if (pausePanel != null) pausePanel.SetActive(false);
@@ -73,17 +71,8 @@ namespace BlockBlast.UI
 
         private void OnHomeClicked()
         {
-            Debug.Log("[PauseUI] Home clicked.");
             PlayClick();
-
-            if (!Application.CanStreamedLevelBeLoaded(mainMenuSceneName))
-            {
-                Debug.LogError("[PauseUI] Scene '" + mainMenuSceneName +
-                               "' load nahi ho sakta. Naam sahi hai? Build Settings mein add hai?");
-                return;
-            }
-
-            SceneManager.LoadScene(mainMenuSceneName);
+            ScreenFader.LoadScene(mainMenuSceneName);
         }
 
         private void PlayClick()

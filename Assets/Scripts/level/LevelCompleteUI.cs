@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
 using BlockBlast.Core;
 using BlockBlast.Game;
@@ -43,11 +43,20 @@ namespace BlockBlast.UI
 
         private void Show()
         {
-            if (panel != null) panel.SetActive(true);
-
             LevelData lvl = LevelManager.Instance != null ? LevelManager.Instance.CurrentLevel : null;
-            if (titleText != null && lvl != null) titleText.text = "LEVEL " + lvl.levelNumber + " COMPLETE!";
-            if (scoreText != null && ScoreManager.Instance != null) scoreText.text = ScoreManager.Instance.CurrentScore.ToString();
+            if (titleText != null) titleText.text = lvl != null ? "LEVEL " + lvl.levelNumber + " CLEAR!" : "LEVEL CLEAR!";
+
+            int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
+            if (scoreText != null) scoreText.text = "0";
+
+            if (panel != null) panel.SetActive(true);
+            if (scoreText != null) StartCoroutine(CountUp(scoreText, score));
+        }
+
+        private IEnumerator CountUp(TextMeshProUGUI text, int target)
+        {
+            yield return new WaitForSecondsRealtime(0.35f);
+            yield return Tween.Run(0.7f, k => text.text = Mathf.RoundToInt(target * Ease.OutCubic(k)).ToString());
         }
 
         private void Hide()
@@ -57,22 +66,15 @@ namespace BlockBlast.UI
 
         private void OnNextClicked()
         {
+            if (Audio.AudioManager.Instance != null) Audio.AudioManager.Instance.PlayButtonClickSound();
             if (LevelManager.Instance != null) LevelManager.Instance.NextLevel();
         }
 
         private void OnHomeClicked()
         {
-            Debug.Log("[LevelCompleteUI] Home clicked.");
-
-            if (!Application.CanStreamedLevelBeLoaded(mainMenuSceneName))
-            {
-                Debug.LogError("[LevelCompleteUI] Scene '" + mainMenuSceneName +
-                               "' load nahi ho sakta. Naam sahi hai? Build Settings mein add hai?");
-                return;
-            }
-
+            if (Audio.AudioManager.Instance != null) Audio.AudioManager.Instance.PlayButtonClickSound();
             // Progress CompleteLevel() mein pehle hi save ho chuka hai, to Home par jane se level nahi khoye ga
-            SceneManager.LoadScene(mainMenuSceneName);
+            ScreenFader.LoadScene(mainMenuSceneName);
         }
     }
 }

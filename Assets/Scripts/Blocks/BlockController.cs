@@ -14,6 +14,42 @@ namespace BlockBlast.Blocks
 
         private Transform piecesParent;
         private GameConfig config;
+        private Coroutine animRoutine;
+
+        /// <summary>Stops any running tray animation (called when the player picks the block up).</summary>
+        public void CancelAnimations()
+        {
+            if (animRoutine != null)
+            {
+                StopCoroutine(animRoutine);
+                animRoutine = null;
+            }
+        }
+
+        /// <summary>Scales the block in from nothing with a springy overshoot.</summary>
+        public void PlaySpawnPop(float targetScale, float delay)
+        {
+            CancelAnimations();
+            if (!isActiveAndEnabled) return;
+            animRoutine = StartCoroutine(SpawnPopRoutine(targetScale, delay));
+        }
+
+        private System.Collections.IEnumerator SpawnPopRoutine(float targetScale, float delay)
+        {
+            transform.localScale = Vector3.zero;
+            if (delay > 0f) yield return new WaitForSeconds(delay);
+            float duration = 0.35f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float k = Mathf.Clamp01(elapsed / duration);
+                transform.localScale = Vector3.one * targetScale * BlockBlast.UI.Ease.OutBack(k, 2.6f);
+                yield return null;
+            }
+            transform.localScale = Vector3.one * targetScale;
+            animRoutine = null;
+        }
 
         public void Initialize(BlockShapeData shapeData, Color color, GameConfig cfg = null)
         {
@@ -82,7 +118,8 @@ namespace BlockBlast.Blocks
             if (Slot != null)
             {
                 transform.SetParent(Slot.transform, true);
-                StartCoroutine(SmoothReturnRoutine());
+                CancelAnimations();
+                animRoutine = StartCoroutine(SmoothReturnRoutine());
             }
         }
 
@@ -99,7 +136,7 @@ namespace BlockBlast.Blocks
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float t = elapsed / duration;
+                float t = BlockBlast.UI.Ease.OutCubic(Mathf.Clamp01(elapsed / duration));
                 transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
                 transform.localScale = Vector3.Lerp(startScale, targetScale, t);
                 yield return null;
@@ -108,6 +145,7 @@ namespace BlockBlast.Blocks
             transform.localPosition = targetPos;
             transform.localScale = targetScale;
             SetSortingOrder(10);
+            animRoutine = null;
         }
     }
 }

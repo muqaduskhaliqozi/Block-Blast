@@ -32,7 +32,12 @@ namespace BlockBlast.Audio
             }
 
             GenerateProceduralAudio();
+
+            IsMuted = PlayerPrefs.GetInt(MuteKey, 0) == 1;
+            sfxSource.mute = IsMuted;
         }
+
+        public const string MuteKey = "BlockBlast_Muted";
 
         private void GenerateProceduralAudio()
         {
@@ -61,6 +66,8 @@ namespace BlockBlast.Audio
         {
             IsMuted = !IsMuted;
             sfxSource.mute = IsMuted;
+            PlayerPrefs.SetInt(MuteKey, IsMuted ? 1 : 0);
+            PlayerPrefs.Save();
         }
     }
 }

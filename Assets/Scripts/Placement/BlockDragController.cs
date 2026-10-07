@@ -174,9 +174,8 @@ namespace BlockBlast.Placement
                 dragOffset =
                     block.transform.position - pointerWorldPos;
 
-                // Scale block to full 1:1 board size when picked up
-                draggingBlock.transform.localScale =
-                    Vector3.one * config.dragBlockScale;
+                // Stop any tray pop / return animation; the block grows smoothly to board size in UpdateDragging
+                draggingBlock.CancelAnimations();
 
                 draggingBlock.SetSortingOrder(50);
 
@@ -211,6 +210,12 @@ namespace BlockBlast.Placement
                     draggingBlock.transform.position,
                     targetPos,
                     Time.deltaTime * config.lerpSpeed);
+
+            draggingBlock.transform.localScale =
+                Vector3.Lerp(
+                    draggingBlock.transform.localScale,
+                    Vector3.one * config.dragBlockScale,
+                    Time.deltaTime * 18f);
 
             // Calculate grid alignment preview
             BoardManager board = BoardManager.Instance;

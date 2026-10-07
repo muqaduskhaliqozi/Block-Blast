@@ -1,6 +1,6 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using TMPro;
 using BlockBlast.Core;
 using BlockBlast.Scoring;
@@ -15,7 +15,15 @@ namespace BlockBlast.UI
         [SerializeField] private Button retryButton;
         [SerializeField] private Button homeButton;
 
+        [Header("Polish")]
+        [Tooltip("Seconds to wait so the player sees the board grey out before the popup")]
+        [SerializeField] private float showDelay = 1.0f;
+        [SerializeField] private GameObject newBestBadge;
+
         [SerializeField] private string mainMenuSceneName = "MainMenu";
+
+        private int bestBeforeRun;
+        private Coroutine showRoutine;
 
         private void Start()
         {
@@ -28,6 +36,8 @@ namespace BlockBlast.UI
             {
                 GameStateManager.Instance.OnStateChanged += HandleStateChanged;
             }
+
+            RememberBest();
         }
 
         private void OnDestroy()
@@ -38,11 +48,22 @@ namespace BlockBlast.UI
             }
         }
 
+        private void RememberBest()
+        {
+            bestBeforeRun = PlayerPrefs.GetInt("BlockBlast_BestScore", 0);
+        }
+
         private void HandleStateChanged(GameState oldState, GameState newState)
         {
             if (newState == GameState.GameOver)
             {
-                ShowGameOverPanel();
+                if (showRoutine != null) StopCoroutine(showRoutine);
+                showRoutine = StartCoroutine(ShowAfterDelay());
+
+                if (Audio.AudioManager.Instance != null)
+                {
+                    Audio.AudioManager.Instance.PlayGameOverSound();
+                }
             }
             else if (newState == GameState.Playing || newState == GameState.Restarting)
             {
@@ -50,25 +71,46 @@ namespace BlockBlast.UI
             }
         }
 
+        private IEnumerator ShowAfterDelay()
+        {
+            yield return new WaitForSecondsRealtime(showDelay);
+            showRoutine = null;
+            if (GameStateManager.Instance == null || GameStateManager.Instance.CurrentState == GameState.GameOver)
+                ShowGameOverPanel();
+        }
+
         public void ShowGameOverPanel()
         {
+            int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
+            int best = ScoreManager.Instance != null ? ScoreManager.Instance.BestScore : score;
+            bool isNewBest = score > 0 && score > bestBeforeRun;
+
+            if (newBestBadge != null) newBestBadge.SetActive(isNewBest);
+            if (bestScoreText != null) bestScoreText.text = best.ToString();
+            if (finalScoreText != null) finalScoreText.text = "0";
+
             if (gameOverPanel != null) gameOverPanel.SetActive(true);
 
-            if (ScoreManager.Instance != null)
-            {
-                if (finalScoreText != null) finalScoreText.text = ScoreManager.Instance.CurrentScore.ToString();
-                if (bestScoreText != null) bestScoreText.text = $"BEST: {ScoreManager.Instance.BestScore}";
-            }
+            if (finalScoreText != null) StartCoroutine(CountUp(finalScoreText, score));
+        }
 
-            if (Audio.AudioManager.Instance != null)
+        private IEnumerator CountUp(TextMeshProUGUI text, int target)
+        {
+            yield return new WaitForSecondsRealtime(0.3f);
+            float dur = Mathf.Clamp(0.4f + target * 0.002f, 0.4f, 1.2f);
+            yield return Tween.Run(dur, k =>
             {
-                Audio.AudioManager.Instance.PlayGameOverSound();
-            }
+                text.text = Mathf.RoundToInt(target * Ease.OutCubic(k)).ToString();
+                text.transform.localScale = Vector3.one * (k < 1f ? 1.08f : 1f);
+            });
+            yield return Tween.Run(0.3f, k => text.transform.localScale = Vector3.one * Mathf.LerpUnclamped(1.3f, 1f, Ease.OutBack(k, 3f)));
         }
 
         public void HideGameOverPanel()
         {
+            if (showRoutine != null) { StopCoroutine(showRoutine); showRoutine = null; }
             if (gameOverPanel != null) gameOverPanel.SetActive(false);
+            RememberBest();
         }
 
         private void OnRetryClicked()
@@ -91,16 +133,7 @@ namespace BlockBlast.UI
                 Audio.AudioManager.Instance.PlayButtonClickSound();
             }
 
-            Debug.Log("[GameOverUI] Home button clicked.");
-
-            if (!Application.CanStreamedLevelBeLoaded(mainMenuSceneName))
-            {
-                Debug.LogError("[GameOverUI] Scene '" + mainMenuSceneName +
-                               "' load nahi ho sakta. Naam sahi hai? Build Settings mein add hai?");
-                return;
-            }
-
-            SceneManager.LoadScene(mainMenuSceneName);
+            ScreenFader.LoadScene(mainMenuSceneName);
         }
     }
 }
