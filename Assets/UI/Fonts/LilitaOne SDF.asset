@@ -126,9 +126,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c1514a6bd24e1e882cebbe1904ce04, type: 3}
   m_Name: LilitaOne SDF
   m_EditorClassIdentifier: 
-  hashCode: 0
+  hashCode: -666464736
   material: {fileID: -7382325368178123166}
-  materialHashCode: -2006316128
+  materialHashCode: 2047028224
   m_Version: 1.1.0
   m_SourceFontFileGUID: 110ced3d6f7494d11bc01ee05410731a
   m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 110ced3d6f7494d11bc01ee05410731a, type: 3}
